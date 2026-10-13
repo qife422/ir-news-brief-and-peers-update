@@ -1,0 +1,37 @@
+# Machine and interpreter artifacts
+.DS_Store
+.Rhistory
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Credentials and session state must never enter the public Skill repository
+.env
+.env.*
+*.pem
+*.key
+auth.json
+credentials*.json
+*cookies*.json
+
+# Real working inputs and generated outputs belong to the using project
+/data/
+/output/
+/private/
+/snapshots/
+/backups/
+/logs/
+/workspace*.json
+/report*.json
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+*.tsv
+*.pdf
+*.zip
+*.tar
+*.gz

@@ -1,0 +1,129 @@
+{
+  "metadata": {
+    "schema_version": "1.0",
+    "id": "example.ir-workspace",
+    "label": "Example：虚构数据，仅演示IR工作流",
+    "status": "Example",
+    "subject_company": "Trip.com Group",
+    "as_of": "2026-03-01T00:00:00Z",
+    "timezone": "UTC",
+    "audience": "public",
+    "allowed_visibility": ["public"]
+  },
+  "sources": [
+    {
+      "id": "example.source.company",
+      "material_id": "example.material.company",
+      "company": "Trip.com Group",
+      "title": "Example：虚构主体公司季度公告",
+      "kind": "earnings_release",
+      "url": "https://example.org/company-release",
+      "version": "1",
+      "published_at": "2026-02-20T12:00:00Z",
+      "available_at": "2026-02-20T12:00:00Z",
+      "version_at": "2026-02-20T12:00:00Z",
+      "retrieved_at": "2026-02-21T12:00:00Z",
+      "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "fingerprint_scope": "Example占位指纹，不对应真实公告",
+      "independence_key": "example.company-origin",
+      "authorized": true,
+      "visibility": "public",
+      "audiences": ["public", "internal"],
+      "status": "active"
+    },
+    {
+      "id": "example.source.peer",
+      "material_id": "example.material.peer",
+      "company": "Booking Holdings",
+      "title": "Example：虚构同业业绩及财报前预期快照",
+      "kind": "example_financial_material",
+      "url": "https://example.org/peer-release",
+      "version": "1",
+      "published_at": "2026-02-18T12:00:00Z",
+      "available_at": "2026-02-18T12:00:00Z",
+      "version_at": "2026-02-18T12:00:00Z",
+      "retrieved_at": "2026-02-21T12:00:00Z",
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "fingerprint_scope": "Example占位指纹，不对应真实数据",
+      "independence_key": "example.peer-origin",
+      "authorized": true,
+      "visibility": "public",
+      "audiences": ["public", "internal"],
+      "status": "active"
+    },
+    {
+      "id": "example.source.meeting",
+      "material_id": "example.material.meeting",
+      "company": "Trip.com Group",
+      "title": "Example：虚构获准公开会议记录",
+      "kind": "meeting_record",
+      "url": "https://example.org/meeting-record",
+      "version": "1",
+      "published_at": "2026-02-25T12:00:00Z",
+      "available_at": "2026-02-25T12:00:00Z",
+      "version_at": "2026-02-25T12:00:00Z",
+      "retrieved_at": "2026-02-26T12:00:00Z",
+      "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "fingerprint_scope": "Example占位指纹，不对应真实会议",
+      "independence_key": "example.meeting-origin",
+      "authorized": true,
+      "visibility": "public",
+      "audiences": ["public", "internal"],
+      "status": "active"
+    }
+  ],
+  "excerpts": [
+    {"id": "example.excerpt.company", "source_id": "example.source.company", "locator": "Example公告：营销段落1", "text": "Example：主体公司披露了渠道功能，未披露AI获客成本改善。"},
+    {"id": "example.excerpt.peer", "source_id": "example.source.peer", "locator": "Example公告：经营段落1", "text": "Example：同业声称新的工具帮助渠道效率；这不是主体公司事实。"},
+    {"id": "example.excerpt.actual", "source_id": "example.source.peer", "locator": "Example财务表：收入行", "text": "Example：Booking Holdings 2025Q4收入实际值为100.50，单位USD million，GAAP。"},
+    {"id": "example.excerpt.consensus", "source_id": "example.source.peer", "locator": "Example快照：收入行", "text": "Example：2026-02-18T12:00:00Z财报前快照收入预期为99.50，单位USD million，GAAP。"},
+    {"id": "example.excerpt.meeting", "source_id": "example.source.meeting", "locator": "Example会议：Q1", "text": "Example：投资者问，如何验证AI渠道功能是否改善转化效率？"}
+  ],
+  "claims": [
+    {"id": "example.claim.company", "company": "Trip.com Group", "text": "Example：主体公司披露相关功能，成本效果尚无可用指标。", "period": "2025Q4", "definition": "Example：公开产品功能表述，非财务效果", "excerpt_ids": ["example.excerpt.company"], "status": "confirmed"},
+    {"id": "example.claim.peer", "company": "Booking Holdings", "text": "Example：同业表示工具可能改善其渠道效率。", "period": "2025Q4", "definition": "Example：同业管理层表述，非主体公司事实", "excerpt_ids": ["example.excerpt.peer"], "status": "confirmed"}
+  ],
+  "topics": [
+    {
+      "id": "example.topic.ai-distribution",
+      "title": "Example：AI与分销入口",
+      "authorized": true,
+      "visibility": "public",
+      "audiences": ["public", "internal"],
+      "claim_ids": ["example.claim.company", "example.claim.peer"],
+      "base_priority": 3,
+      "analysis": [{"id": "example.analysis.ai", "text": "Example假设：若渠道结构变化，需用流量、转化和费用指标验证；尚不能推断主体公司成本改善。", "type": "hypothesis", "claim_ids": ["example.claim.company", "example.claim.peer"]}],
+      "actions": ["Example准备动作：由IR人员确认可披露的转化和渠道指标。"],
+      "gaps": ["Example缺口：缺少获准使用的主体公司渠道效果指标。"]
+    }
+  ],
+  "questions": [
+    {"id": "example.question.anticipated", "topic_id": "example.topic.ai-distribution", "text": "Example预拟：AI入口变化可能如何影响公司的渠道结构？", "origin": "anticipated", "trigger_claim_ids": ["example.claim.company", "example.claim.peer"], "follow_ups": ["Example追问：有哪些已披露指标可以验证？"], "authorized": true, "visibility": "public", "audiences": ["public", "internal"]},
+    {"id": "example.question.actual", "topic_id": "example.topic.ai-distribution", "text": "Example：如何验证AI渠道功能是否改善转化效率？", "origin": "actual", "trigger_claim_ids": [], "follow_ups": [], "authorized": true, "visibility": "public", "audiences": ["public", "internal"]}
+  ],
+  "answers": [
+    {
+      "id": "example.answer.ai",
+      "question_id": "example.question.anticipated",
+      "version": "1",
+      "authorized": true,
+      "visibility": "public",
+      "audiences": ["public", "internal"],
+      "valid_from": "2026-02-20T12:00:00Z",
+      "valid_until": "2026-04-01T00:00:00Z",
+      "statements": [{"id": "example.answer.ai.s1", "text": "Example回答草稿：公司已有相关功能披露，但尚无足够公开指标证明成本或转化改善。", "kind": "company_position", "company": "Trip.com Group", "claim_ids": ["example.claim.company"]}],
+      "review": {"status": "pending"}
+    }
+  ],
+  "feedback": [
+    {"id": "example.feedback.actual", "question_id": "example.question.actual", "meeting_id": "example.meeting", "kind": "actual", "excerpt_id": "example.excerpt.meeting", "confirmation": {"status": "confirmed", "reviewer": "Example IR审阅人", "at": "2026-02-26T12:00:00Z"}}
+  ],
+  "meetings": [
+    {"id": "example.meeting", "title": "Example：虚构会议", "at": "2026-02-25T12:00:00Z", "question_ids": ["example.question.anticipated", "example.question.actual"], "authorized": true, "visibility": "public", "audiences": ["public", "internal"]}
+  ],
+  "financials": [
+    {"id": "example.financial.actual", "kind": "actual", "company": "Booking Holdings", "metric": "revenue", "period": "2025Q4", "currency": "USD", "unit": "million", "accounting_basis": "GAAP", "share_basis": "not_applicable", "definition_id": "example.revenue", "value": "100.50", "excerpt_ids": ["example.excerpt.actual"], "released_at": "2026-02-20T12:00:00Z"},
+    {"id": "example.financial.consensus", "kind": "consensus", "company": "Booking Holdings", "metric": "revenue", "period": "2025Q4", "currency": "USD", "unit": "million", "accounting_basis": "GAAP", "share_basis": "not_applicable", "definition_id": "example.revenue", "value": "99.50", "excerpt_ids": ["example.excerpt.consensus"], "snapshot_at": "2026-02-18T12:00:00Z"}
+  ],
+  "events": []
+}

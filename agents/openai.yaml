@@ -1,0 +1,5 @@
+interface:
+  display_name: "IR新闻简报与同业数据更新"
+  short_description: "生成可追溯IR简报、投资者问题雷达、财报问答与会议反馈记录"
+  brand_color: "#2563EB"
+  default_prompt: "Use $ir-news-brief-and-peers-update to prepare a source-backed Trip.com Group investor-question radar with evidence, answer drafts, changes and data gaps."

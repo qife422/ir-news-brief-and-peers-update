@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="data:,">
+  <title>IR Intelligence Brief</title>
+  <style>
+    :root {
+      --page: #f4f7fb;
+      --surface: #ffffff;
+      --surface-alt: #eef3f9;
+      --ink: #142033;
+      --muted: #5d6b7c;
+      --line: #d9e1eb;
+      --accent: #2563eb;
+      --accent-soft: #e9f0ff;
+      --positive: #18794e;
+      --negative: #b42318;
+      --mixed: #946200;
+      --neutral: #526173;
+      --radius: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.58;
+    }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    button, select { font: inherit; }
+    button:focus-visible, select:focus-visible, a:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, .32);
+      outline-offset: 2px;
+    }
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: -80px;
+      z-index: 100;
+      background: var(--ink);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+    }
+    .skip-link:focus { top: 16px; }
+    .shell { width: min(1440px, calc(100% - 40px)); margin: 0 auto; }
+    .report-header {
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .header-inner {
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      padding: 12px 0;
+    }
+    .title-block h1 { margin: 0; font-size: clamp(18px, 2vw, 25px); line-height: 1.2; letter-spacing: -.02em; }
+    .meta-line { margin-top: 6px; color: var(--muted); font-size: 12px; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+    .meta-line span { white-space: nowrap; }
+    .header-actions { display: flex; align-items: center; gap: 9px; }
+    .button {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      min-height: 40px;
+      padding: 8px 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .button:hover { border-color: var(--accent); }
+    .button:active { transform: translateY(1px); }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .example-banner {
+      display: none;
+      background: #fff4d8;
+      color: #6f4d00;
+      border-bottom: 1px solid #e9d59c;
+      padding: 9px 20px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .example-banner.visible { display: block; }
+    .controls {
+      margin: 22px auto 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 12px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .field { display: grid; gap: 5px; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .field select {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 7px 34px 7px 10px;
+    }
+    main { padding: 12px 0 56px; }
+    section { margin-top: 34px; }
+    .section-head { margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: clamp(20px, 2.5vw, 30px); line-height: 1.2; letter-spacing: -.025em; }
+    .section-head p { margin: 7px 0 0; color: var(--muted); max-width: 70ch; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .summary-item {
+      min-height: 158px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .summary-item strong { font-size: 17px; line-height: 1.48; }
+    .summary-item p { margin: 14px 0 0; color: var(--muted); font-size: 13px; }
+    .direction { font-weight: 800; }
+    .direction-positive { color: var(--positive); }
+    .direction-negative { color: var(--negative); }
+    .direction-mixed { color: var(--mixed); }
+    .direction-neutral, .direction-uncertain { color: var(--neutral); }
+    .lead-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, .55fr); gap: 16px; }
+    .lead-grid.single { grid-template-columns: minmax(0, 1fr); }
+    .lead-story, .lead-side {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .lead-story.has-image { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr); }
+    .lead-image { min-height: 320px; background: var(--surface-alt); position: relative; }
+    .lead-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .image-credit { position: absolute; left: 10px; bottom: 10px; background: rgba(20,32,51,.82); color: white; padding: 4px 7px; border-radius: 6px; font-size: 10px; }
+    .lead-body { padding: 22px; }
+    .story-kicker { display: flex; flex-wrap: wrap; gap: 7px; color: var(--muted); font-size: 12px; }
+    .story-kicker span { border-right: 1px solid var(--line); padding-right: 7px; }
+    .story-kicker span:last-child { border: 0; padding-right: 0; }
+    .lead-body h3 { margin: 13px 0 10px; font-size: clamp(22px, 3vw, 34px); line-height: 1.23; letter-spacing: -.025em; }
+    .fact { margin: 0; font-size: 16px; }
+    .analysis-block { margin-top: 18px; background: var(--surface-alt); border-radius: 10px; padding: 14px; }
+    .analysis-block p { margin: 0 0 8px; }
+    .analysis-block p:last-child { margin-bottom: 0; }
+    .label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+    .story-footer { margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 12px; }
+    .score { font-family: var(--mono); font-size: 22px; font-weight: 800; color: var(--accent); }
+    .lead-side { padding: 18px; }
+    .lead-side h3 { margin: 0 0 12px; font-size: 16px; }
+    .side-item { padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .side-item:last-child { border-bottom: 0; }
+    .side-item a { color: var(--ink); font-weight: 750; text-decoration: none; }
+    .side-item a:hover { color: var(--accent); }
+    .intelligence-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr); gap: 16px; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+    .panel h3 { margin: 0 0 4px; font-size: 17px; }
+    .panel-sub { margin: 0 0 15px; color: var(--muted); font-size: 12px; }
+    .impact-chart { min-height: 310px; }
+    .impact-chart svg { width: 100%; height: auto; min-height: 280px; overflow: visible; }
+    .axis-label { fill: var(--muted); font-size: 11px; font-family: var(--sans); }
+    .point-label { fill: var(--ink); font-size: 10px; font-family: var(--sans); }
+    .metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .metric { border-top: 2px solid var(--accent); background: var(--surface-alt); border-radius: 10px; padding: 13px; min-height: 136px; }
+    .metric-name { color: var(--muted); font-size: 12px; }
+    .metric-value { margin-top: 5px; font-family: var(--mono); font-size: 24px; font-weight: 800; }
+    .metric-change { font-family: var(--mono); font-size: 12px; }
+    .spark { width: 100%; height: 46px; margin-top: 6px; }
+    .peer-layout { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 16px; }
+    .peer-layout > *, .chart-stack, #peer-table { min-width: 0; }
+    .chart-stack { display: grid; gap: 16px; }
+    .peer-chart svg { width: 100%; height: auto; min-height: 250px; overflow: visible; }
+    .table-wrap { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+    table { border-collapse: collapse; width: 100%; min-width: 920px; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; }
+    th { position: sticky; top: 0; background: var(--surface-alt); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .035em; }
+    th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+    td { font-family: var(--mono); font-size: 12px; }
+    td:first-child, td:nth-child(2) { font-family: var(--sans); }
+    tr:last-child td { border-bottom: 0; }
+    .news-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .news-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .news-card.filtered-out { display: none; }
+    .news-card img { width: 100%; aspect-ratio: 16 / 7; object-fit: cover; display: block; }
+    .news-card details { height: 100%; }
+    .news-card summary { cursor: pointer; list-style: none; padding: 17px; }
+    .news-card summary::-webkit-details-marker { display: none; }
+    .news-card summary::after { content: "+"; float: right; color: var(--accent); font-family: var(--mono); font-size: 20px; }
+    .news-card details[open] summary::after { content: "-"; }
+    .news-card h3 { margin: 9px 28px 6px 0; font-size: 18px; line-height: 1.35; }
+    .news-card .card-body { padding: 0 17px 17px; }
+    .news-card .card-body p { margin: 10px 0 0; }
+    .source-refs { font-family: var(--mono); color: var(--accent); font-size: 11px; }
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .gap-list { margin: 0; padding-left: 20px; }
+    .gap-list li { margin: 8px 0; }
+    .source-list { display: grid; gap: 9px; }
+    .source-record { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+    .source-record summary { cursor: pointer; padding: 13px 15px; font-weight: 750; }
+    .source-record .source-body { padding: 0 15px 15px; color: var(--muted); display: grid; gap: 6px; }
+    .source-id { font-family: var(--mono); color: var(--accent); }
+    .prompt-block { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    .prompt-block div { background: var(--surface); border-left: 3px solid var(--accent); padding: 14px; }
+    .prompt-block h3 { margin: 0 0 6px; font-size: 13px; }
+    .prompt-block p { margin: 0; color: var(--muted); }
+    .empty { min-height: 140px; display: grid; place-items: center; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); padding: 20px; }
+    footer { border-top: 1px solid var(--line); color: var(--muted); padding: 24px 0 40px; font-size: 12px; }
+    .mono { font-family: var(--mono); }
+    .muted { color: var(--muted); }
+
+    @media (max-width: 1023px) {
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .lead-grid, .intelligence-grid, .peer-layout { grid-template-columns: 1fr; }
+      .lead-story.has-image { grid-template-columns: 1fr 1.2fr; }
+      .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 767px) {
+      .shell { width: min(100% - 24px, 1440px); }
+      .report-header { position: static; }
+      .header-inner { grid-template-columns: 1fr; }
+      .header-actions { justify-content: space-between; }
+      .controls, .summary-grid, .news-grid, .action-grid, .prompt-block, .metric-grid { grid-template-columns: 1fr; }
+      .lead-story.has-image { grid-template-columns: 1fr; }
+      .lead-image { min-height: 210px; }
+      .lead-body h3 { font-size: 24px; }
+      .section-head h2 { font-size: 23px; }
+      section { margin-top: 28px; }
+      .point-label { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+
+    @media print {
+      @page { size: A4; margin: 12mm; }
+      body { background: white; font-size: 10pt; }
+      .shell { width: 100%; }
+      .report-header { position: static; border-bottom: 1px solid #777; }
+      .header-actions, .controls, .skip-link { display: none !important; }
+      .example-banner { border: 1px solid #946200; margin-top: 6px; }
+      main { padding-bottom: 0; }
+      section { break-inside: auto; margin-top: 18px; }
+      .summary-item, .lead-story, .lead-side, .panel, .news-card, .source-record, .table-wrap { break-inside: avoid; box-shadow: none; }
+      .news-card details > * { display: block !important; }
+      .news-card summary::after { display: none; }
+      .news-grid, .summary-grid, .action-grid, .prompt-block { gap: 8px; }
+      .lead-grid, .intelligence-grid, .peer-layout { grid-template-columns: 1fr; }
+      .lead-image { max-height: 210px; min-height: 0; }
+      a { color: inherit; text-decoration: none; }
+      footer { padding-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="report-header">
+    <div class="shell header-inner">
+      <div class="title-block">
+        <h1 id="report-title">IR Intelligence Brief</h1>
+        <div class="meta-line" id="report-meta"></div>
+      </div>
+      <div class="header-actions">
+        <span class="status" id="report-status">Draft</span>
+        <button class="button" type="button" id="print-button">打印或保存PDF</button>
+      </div>
+    </div>
+    <div class="example-banner" id="example-banner">示例数据，仅用于展示布局。不得作为正式IR交付。</div>
+  </header>
+
+  <div class="shell controls" aria-label="新闻筛选器">
+    <div class="field">
+      <label for="category-filter">新闻分类</label>
+      <select id="category-filter"><option value="all">全部分类</option></select>
+    </div>
+    <div class="field">
+      <label for="company-filter">相关公司</label>
+      <select id="company-filter"><option value="all">全部公司</option></select>
+    </div>
+    <div class="field">
+      <label for="materiality-filter">重要性</label>
+      <select id="materiality-filter">
+        <option value="all">全部重要性</option>
+        <option value="high">High 75-100</option>
+        <option value="medium">Medium 50-74</option>
+        <option value="low">Low 0-49</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="review-filter">人工复核</label>
+      <select id="review-filter">
+        <option value="all">全部状态</option>
+        <option value="required">需要复核</option>
+        <option value="clear">无需复核</option>
+      </select>
+    </div>
+  </div>
+
+  <main id="main" class="shell">
+    <section aria-labelledby="summary-title">
+      <div class="section-head">
+        <h2 id="summary-title">今日关键判断</h2>
+        <p>结论按决策重要性排序，同时显示影响方向与IR下一步动作。</p>
+      </div>
+      <div class="summary-grid" id="summary-grid"></div>
+    </section>
+
+    <section aria-labelledby="lead-title">
+      <div class="section-head">
+        <h2 id="lead-title">重点事件</h2>
+        <p>主事件展示事实、传导路径、反向解释、重要性和证据来源。</p>
+      </div>
+      <div id="lead-stories"></div>
+    </section>
+
+    <section aria-labelledby="signals-title">
+      <div class="section-head">
+        <h2 id="signals-title">风险与市场信号</h2>
+        <p>影响和紧迫度用于排定IR工作优先级，市场指标仅展示有来源的数据。</p>
+      </div>
+      <div class="intelligence-grid">
+        <article class="panel">
+          <h3>Impact / Urgency</h3>
+          <p class="panel-sub">右上区域代表高影响且需要较快响应。</p>
+          <div class="impact-chart" id="impact-chart"></div>
+        </article>
+        <article class="panel">
+          <h3>Market Pulse</h3>
+          <p class="panel-sub">数值、变化、趋势、时间和Source ID同时展示。</p>
+          <div class="metric-grid" id="market-pulse"></div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="peers-title">
+      <div class="section-head">
+        <h2 id="peers-title">同业估值与经营比较</h2>
+        <p>比较必须使用一致的估值日期、财年、币种、股本和调整口径。</p>
+      </div>
+      <div class="peer-layout">
+        <div class="chart-stack">
+          <article class="panel peer-chart">
+            <h3>2026E P/E示例视图</h3>
+            <p class="panel-sub">仅绘制非空且口径可比的数据。</p>
+            <div id="peer-pe-chart"></div>
+          </article>
+          <article class="panel peer-chart">
+            <h3>增长与利润率</h3>
+            <p class="panel-sub">横轴为收入增长，纵轴为EBITDA Margin。</p>
+            <div id="peer-growth-chart"></div>
+          </article>
+        </div>
+        <div id="peer-table"></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="news-title">
+      <div class="section-head">
+        <h2 id="news-title">分类新闻与分析</h2>
+        <p id="news-count">显示全部新闻。</p>
+      </div>
+      <div class="news-grid" id="news-grid"></div>
+    </section>
+
+    <section aria-labelledby="gaps-title">
+      <div class="section-head">
+        <h2 id="gaps-title">行动与数据缺口</h2>
+        <p>未解决的问题保持可见，不用假数据填满页面。</p>
+      </div>
+      <div class="action-grid">
+        <article class="panel">
+          <h3>IR行动队列</h3>
+          <div id="action-queue"></div>
+        </article>
+        <article class="panel">
+          <h3>数据缺口</h3>
+          <div id="data-gaps"></div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="sources-title">
+      <div class="section-head">
+        <h2 id="sources-title">Source Ledger</h2>
+        <p>每条新闻和财务数据通过Source ID回溯到时间、来源和复核状态。</p>
+      </div>
+      <div class="source-list" id="source-list"></div>
+    </section>
+
+    <section aria-labelledby="prompt-title">
+      <div class="section-head">
+        <h2 id="prompt-title">Prompt与范围</h2>
+      </div>
+      <div class="prompt-block" id="prompt-block"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell" id="footer-copy"></div>
+  </footer>
+
+  <script>
+    "use strict";
+    const DATA = __REPORT_DATA_JSON__;
+
+    const esc = (value) => String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+
+    const safeUrl = (value) => {
+      if (!value) return "";
+      try {
+        const url = new URL(value);
+        return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+      } catch { return ""; }
+    };
+
+    const formatDate = (value) => {
+      if (!value) return "时间缺失";
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toLocaleString("zh-CN", { hour12: false });
+    };
+
+    const formatNumber = (value, digits = 1) => value === null || value === undefined
+      ? "N/A"
+      : Number(value).toLocaleString("zh-CN", { maximumFractionDigits: digits });
+
+    const directionText = {
+      positive: "正面",
+      negative: "负面",
+      mixed: "混合",
+      neutral: "中性",
+      uncertain: "不确定"
+    };
+
+    const materialityBand = (score) => score >= 75 ? "high" : score >= 50 ? "medium" : "low";
+    const allNews = [...(DATA.top_stories || []), ...(DATA.news || [])];
+    const metadata = DATA.metadata || {};
+
+    document.documentElement.lang = metadata.language || "zh-CN";
+    document.title = metadata.title || "IR Intelligence Brief";
+    document.getElementById("report-title").textContent = metadata.title || "IR Intelligence Brief";
+    document.getElementById("report-status").textContent = metadata.report_status || "Draft";
+    document.getElementById("report-meta").innerHTML = [
+      `报告日期 ${esc(metadata.report_date)}`,
+      `截至 ${esc(formatDate(metadata.as_of))}`,
+      `范围 ${esc(formatDate(metadata.coverage_start))} 至 ${esc(formatDate(metadata.coverage_end))}`,
+      `时区 ${esc(metadata.timezone)}`,
+      esc(metadata.data_freshness || "")
+    ].filter(Boolean).map(item => `<span>${item}</span>`).join("");
+
+    if (String(metadata.report_status || "").toLowerCase() === "example") {
+      document.getElementById("example-banner").classList.add("visible");
+    }
+
+    document.getElementById("print-button").addEventListener("click", () => window.print());
+
+    const renderSummary = () => {
+      const host = document.getElementById("summary-grid");
+      const items = DATA.executive_summary || [];
+      host.innerHTML = items.length ? items.map((item, index) => `
+        <article class="summary-item">
+          <div>
+            <span class="label">判断 ${index + 1}</span>
+            <strong>${esc(item.text)}</strong>
+          </div>
+          <p><span class="direction direction-${esc(item.direction)}">${esc(directionText[item.direction] || item.direction)}</span>　${esc(item.ir_action)}</p>
+        </article>`).join("") : `<div class="empty">缺少执行摘要。</div>`;
+    };
+
+    const storyMeta = (story) => `
+      <div class="story-kicker">
+        <span>${esc(story.category)}</span>
+        <span>${esc(story.company || "相关公司未标明")}</span>
+        <span>${esc(story.region || "地区未标明")}</span>
+        <span>${esc(formatDate(story.published_at))}</span>
+      </div>`;
+
+    const renderLeadStories = () => {
+      const host = document.getElementById("lead-stories");
+      const stories = DATA.top_stories || [];
+      if (!stories.length) {
+        host.innerHTML = `<div class="empty">当前没有符合重点事件标准且来源完整的内容。</div>`;
+        return;
+      }
+      const lead = stories[0];
+      const image = safeUrl(lead.image_url);
+      const imageBlock = image ? `<div class="lead-image"><img src="${esc(image)}" alt="${esc(lead.image_alt)}" referrerpolicy="no-referrer"><span class="image-credit">图片来源：${esc(lead.image_source)}</span></div>` : "";
+      const side = stories.slice(1).map(story => `<div class="side-item"><a href="#news-${esc(story.id)}">${esc(story.title)}</a><div class="muted">${esc(story.materiality_score)} / 100　${esc(story.ir_action)}</div></div>`).join("");
+      host.innerHTML = `<div class="lead-grid ${side ? "" : "single"}">
+        <article class="lead-story ${image ? "has-image" : ""}">
+          ${imageBlock}
+          <div class="lead-body">
+            ${storyMeta(lead)}
+            <h3>${esc(lead.title)}</h3>
+            <p class="fact"><span class="label">确认事实</span><br>${esc(lead.summary)}</p>
+            <div class="analysis-block">
+              <p><span class="label">传导路径</span><br>${esc(lead.transmission_path)}</p>
+              <p><span class="label">反向解释</span><br>${esc(lead.counterpoint || "未提供反向解释")}</p>
+              <p><span class="label">IR动作</span><br>${esc(lead.ir_action)}</p>
+            </div>
+            <div class="story-footer">
+              <span class="score">${esc(lead.materiality_score)}</span><span>/ 100</span>
+              <span class="direction direction-${esc(lead.direction)}">${esc(directionText[lead.direction] || lead.direction)}</span>
+              <span>${esc(lead.horizon)}</span>
+              <span class="source-refs">${esc((lead.source_ids || []).join(", "))}</span>
+            </div>
+          </div>
+        </article>
+        ${side ? `<aside class="lead-side"><h3>其他重点事件</h3>${side}</aside>` : ""}
+      </div>`;
+    };
+
+    const renderImpactChart = (items) => {
+      const host = document.getElementById("impact-chart");
+      if (!items.length) { host.innerHTML = `<div class="empty">没有可绘制的新闻评分。</div>`; return; }
+      const width = 620, height = 310, left = 52, right = 22, top = 20, bottom = 42;
+      const plotW = width - left - right, plotH = height - top - bottom;
+      const x = value => left + ((Number(value) - 1) / 4) * plotW;
+      const y = value => top + plotH - ((Number(value) - 1) / 4) * plotH;
+      const grid = [1,2,3,4,5].map(value => `
+        <line x1="${x(value)}" y1="${top}" x2="${x(value)}" y2="${top + plotH}" stroke="#d9e1eb" stroke-width="1" />
+        <line x1="${left}" y1="${y(value)}" x2="${left + plotW}" y2="${y(value)}" stroke="#d9e1eb" stroke-width="1" />
+        <text x="${x(value)}" y="${height - 18}" text-anchor="middle" class="axis-label">${value}</text>
+        <text x="${left - 16}" y="${y(value) + 4}" text-anchor="middle" class="axis-label">${value}</text>`).join("");
+      const points = items.slice(0, 18).map((item, index) => {
+        const color = item.direction === "positive" ? "#18794e" : item.direction === "negative" ? "#b42318" : item.direction === "mixed" ? "#946200" : "#526173";
+        const label = String(item.title || "").slice(0, 13);
+        return `<g tabindex="0" role="img" aria-label="${esc(item.title)}，影响${esc(item.impact)}，紧迫度${esc(item.urgency)}">
+          <circle cx="${x(item.impact)}" cy="${y(item.urgency)}" r="${5 + Number(item.materiality_score || 0) / 22}" fill="${color}" fill-opacity=".82"><title>${esc(item.title)} | ${esc(item.materiality_score)} / 100 | ${esc((item.source_ids || []).join(", "))}</title></circle>
+          <text x="${x(item.impact) + 10}" y="${y(item.urgency) - 8 + (index % 2) * 15}" class="point-label">${esc(label)}</text>
+        </g>`;
+      }).join("");
+      host.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="新闻影响与紧迫度散点图">
+        <rect x="${x(3)}" y="${y(5)}" width="${x(5)-x(3)}" height="${y(3)-y(5)}" fill="#e9f0ff" />
+        ${grid}${points}
+        <text x="${left + plotW/2}" y="${height - 2}" text-anchor="middle" class="axis-label">业务影响</text>
+        <text x="14" y="${top + plotH/2}" transform="rotate(-90 14 ${top + plotH/2})" text-anchor="middle" class="axis-label">响应紧迫度</text>
+      </svg>`;
+    };
+
+    const sparkline = (values) => {
+      if (!Array.isArray(values) || values.length < 2) return "";
+      const min = Math.min(...values), max = Math.max(...values), spread = max - min || 1;
+      const points = values.map((value, index) => `${(index/(values.length-1))*220},${52-((value-min)/spread)*42}`).join(" ");
+      return `<svg class="spark" viewBox="0 0 220 60" aria-hidden="true"><polyline points="${points}" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg>`;
+    };
+
+    const renderMarketPulse = () => {
+      const host = document.getElementById("market-pulse");
+      const metrics = DATA.market_pulse || [];
+      host.innerHTML = metrics.length ? metrics.map(metric => {
+        const change = Number(metric.change || 0);
+        const direction = change > 0 ? "positive" : change < 0 ? "negative" : "neutral";
+        return `<article class="metric">
+          <div class="metric-name">${esc(metric.label)}</div>
+          <div class="metric-value">${esc(formatNumber(metric.value))} <small>${esc(metric.unit)}</small></div>
+          <div class="metric-change direction-${direction}">${change > 0 ? "+" : ""}${esc(formatNumber(change))}</div>
+          ${sparkline(metric.trend)}
+          <div class="muted mono">${esc(metric.source_id)} | ${esc(formatDate(metric.as_of))}</div>
+        </article>`;
+      }).join("") : `<div class="empty">市场指标数据不足。</div>`;
+    };
+
+    const renderPeerPeChart = () => {
+      const host = document.getElementById("peer-pe-chart");
+      const peers = (DATA.peers || []).filter(peer => Number.isFinite(Number(peer.pe_26e)));
+      if (!peers.length) { host.innerHTML = `<div class="empty">P/E数据不足。</div>`; return; }
+      const width = 520, rowH = 48, left = 150, right = 34, top = 25, bottom = 30;
+      const height = top + bottom + peers.length * rowH;
+      const max = Math.max(...peers.map(peer => Number(peer.pe_26e))) * 1.15;
+      const x = value => left + (Number(value) / max) * (width-left-right);
+      const sorted = peers.map(peer => Number(peer.pe_26e)).sort((a,b) => a-b);
+      const mid = Math.floor(sorted.length / 2);
+      const median = sorted.length % 2 ? sorted[mid] : (sorted[mid-1] + sorted[mid]) / 2;
+      const rows = peers.map((peer, index) => {
+        const cy = top + index * rowH + rowH/2;
+        return `<line x1="${left}" y1="${cy}" x2="${x(peer.pe_26e)}" y2="${cy}" stroke="#d9e1eb" stroke-width="2" />
+          <circle cx="${x(peer.pe_26e)}" cy="${cy}" r="6" fill="#2563eb"><title>${esc(peer.company)} ${esc(peer.pe_26e)}x | ${esc(peer.source_id)}</title></circle>
+          <text x="${left-10}" y="${cy+4}" text-anchor="end" class="axis-label">${esc(peer.company)}</text>
+          <text x="${x(peer.pe_26e)+10}" y="${cy+4}" class="axis-label">${esc(formatNumber(peer.pe_26e))}x</text>`;
+      }).join("");
+      host.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="同业2026E P/E横向点图">
+        <line x1="${x(median)}" y1="${top-5}" x2="${x(median)}" y2="${height-bottom+5}" stroke="#946200" stroke-width="2" stroke-dasharray="5 5" />
+        <text x="${x(median)+6}" y="14" class="axis-label">中位数 ${esc(formatNumber(median))}x</text>${rows}
+      </svg>`;
+    };
+
+    const renderGrowthChart = () => {
+      const host = document.getElementById("peer-growth-chart");
+      const peers = (DATA.peers || []).filter(peer => Number.isFinite(Number(peer.revenue_growth)) && Number.isFinite(Number(peer.ebitda_margin)));
+      if (!peers.length) { host.innerHTML = `<div class="empty">增长与利润率数据不足。</div>`; return; }
+      const width = 520, height = 300, left = 54, right = 24, top = 26, bottom = 42;
+      const valuesX = peers.map(peer => Number(peer.revenue_growth));
+      const valuesY = peers.map(peer => Number(peer.ebitda_margin));
+      const minX = Math.min(0, ...valuesX) - 2, maxX = Math.max(...valuesX) + 2;
+      const minY = Math.min(0, ...valuesY) - 3, maxY = Math.max(...valuesY) + 3;
+      const x = value => left + ((Number(value)-minX)/(maxX-minX || 1))*(width-left-right);
+      const y = value => top + (height-top-bottom) - ((Number(value)-minY)/(maxY-minY || 1))*(height-top-bottom);
+      const points = peers.map((peer, index) => `<g tabindex="0" role="img" aria-label="${esc(peer.company)}，收入增长${esc(peer.revenue_growth)}%，EBITDA Margin ${esc(peer.ebitda_margin)}%">
+        <circle cx="${x(peer.revenue_growth)}" cy="${y(peer.ebitda_margin)}" r="7" fill="#2563eb"><title>${esc(peer.company)} | ${esc(peer.source_id)}</title></circle>
+        <text x="${x(peer.revenue_growth)+10}" y="${y(peer.ebitda_margin)+(index%2?13:-8)}" class="point-label">${esc(peer.company)}</text>
+      </g>`).join("");
+      host.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="同业收入增长与EBITDA Margin散点图">
+        <line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}" stroke="#a9b6c6" />
+        <line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="#a9b6c6" />
+        ${points}
+        <text x="${left+(width-left-right)/2}" y="${height-8}" text-anchor="middle" class="axis-label">收入增长 %</text>
+        <text x="14" y="${top+(height-top-bottom)/2}" transform="rotate(-90 14 ${top+(height-top-bottom)/2})" text-anchor="middle" class="axis-label">EBITDA Margin %</text>
+      </svg>`;
+    };
+
+    const renderPeerTable = () => {
+      const host = document.getElementById("peer-table");
+      const peers = DATA.peers || [];
+      if (!peers.length) { host.innerHTML = `<div class="empty">数据不足 / 需要外部数据库或用户提供数据。</div>`; return; }
+      host.innerHTML = `<div class="table-wrap"><table>
+        <thead><tr><th>Company</th><th>Ticker</th><th>2026E P/E</th><th>2026E EV/EBITDA</th><th>Revenue Growth</th><th>EBITDA Margin</th><th>As of</th><th>Source</th></tr></thead>
+        <tbody>${peers.map(peer => `<tr>
+          <td>${esc(peer.company)}</td><td>${esc(peer.ticker)}</td>
+          <td>${esc(formatNumber(peer.pe_26e))}${peer.pe_26e == null ? "" : "x"}</td>
+          <td>${esc(formatNumber(peer.ev_ebitda_26e))}${peer.ev_ebitda_26e == null ? "" : "x"}</td>
+          <td>${esc(formatNumber(peer.revenue_growth))}${peer.revenue_growth == null ? "" : "%"}</td>
+          <td>${esc(formatNumber(peer.ebitda_margin))}${peer.ebitda_margin == null ? "" : "%"}</td>
+          <td>${esc(formatDate(peer.as_of))}</td><td>${esc(peer.source_id)}</td>
+        </tr>`).join("")}</tbody>
+      </table></div><p class="muted">口径：${esc(peers[0]?.metric_basis || "未说明")}。每行仍以自身Source ID和as-of为准。</p>`;
+    };
+
+    const renderNews = (items = allNews) => {
+      const host = document.getElementById("news-grid");
+      document.getElementById("news-count").textContent = `显示 ${items.length} / ${allNews.length} 条新闻。`;
+      host.innerHTML = items.length ? items.map(story => {
+        const image = safeUrl(story.image_url);
+        return `<article class="news-card" id="news-${esc(story.id)}">
+          ${image ? `<img src="${esc(image)}" alt="${esc(story.image_alt)}" loading="lazy" referrerpolicy="no-referrer">` : ""}
+          <details>
+            <summary>${storyMeta(story)}<h3>${esc(story.title)}</h3><div><span class="direction direction-${esc(story.direction)}">${esc(directionText[story.direction] || story.direction)}</span>　<span class="mono">${esc(story.materiality_score)} / 100</span></div></summary>
+            <div class="card-body">
+              <p><span class="label">确认事实</span><br>${esc(story.summary)}</p>
+              <p><span class="label">传导路径</span><br>${esc(story.transmission_path)}</p>
+              <p><span class="label">反向解释</span><br>${esc(story.counterpoint || "未提供")}</p>
+              <p><span class="label">IR动作</span><br>${esc(story.ir_action)}</p>
+              <p class="source-refs">${esc((story.source_ids || []).join(", "))}${story.manual_review ? " | 需要人工复核" : ""}</p>
+            </div>
+          </details>
+        </article>`;
+      }).join("") : `<div class="empty">当前筛选条件下没有新闻。</div>`;
+    };
+
+    const renderActionsAndGaps = () => {
+      const actions = allNews.filter(item => item.ir_action).sort((a,b) => Number(b.materiality_score)-Number(a.materiality_score));
+      document.getElementById("action-queue").innerHTML = actions.length ? `<ol class="gap-list">${actions.map(item => `<li><strong>${esc(item.title)}</strong><br><span class="muted">${esc(item.ir_action)}</span></li>`).join("")}</ol>` : `<div class="empty">没有已定义的IR动作。</div>`;
+      const gaps = DATA.data_gaps || [];
+      document.getElementById("data-gaps").innerHTML = gaps.length ? `<ul class="gap-list">${gaps.map(gap => `<li>${esc(gap)}</li>`).join("")}</ul>` : `<p class="muted">未记录数据缺口。正式交付前仍需完成最终复核。</p>`;
+    };
+
+    const renderSources = () => {
+      const host = document.getElementById("source-list");
+      const sources = DATA.sources || [];
+      host.innerHTML = sources.length ? sources.map(source => {
+        const url = safeUrl(source.url);
+        return `<details class="source-record">
+          <summary><span class="source-id">${esc(source.id)}</span>　${esc(source.name)}　<span class="muted">${esc(source.reliability)}</span></summary>
+          <div class="source-body">
+            <div><strong>标题或数据集：</strong>${esc(source.title || source.source_note || "未提供")}</div>
+            <div><strong>类型：</strong>${esc(source.source_type)}　<strong>发布时间：</strong>${esc(formatDate(source.published_at))}</div>
+            <div><strong>访问时间：</strong>${esc(formatDate(source.accessed_at))}　<strong>人工复核：</strong>${source.manual_review ? "需要" : "不需要"}</div>
+            <div>${url ? `<a href="${esc(url)}" target="_blank" rel="noreferrer">打开来源</a>` : esc(source.source_note || "无公开URL")}</div>
+          </div>
+        </details>`;
+      }).join("") : `<div class="empty">缺少来源台账。</div>`;
+    };
+
+    const renderPrompt = () => {
+      const prompt = DATA.prompt_used || {};
+      document.getElementById("prompt-block").innerHTML = [
+        ["任务摘要", prompt.brief],
+        ["筛选标准", prompt.screening_criteria],
+        ["来源范围", prompt.source_scope]
+      ].map(([title, body]) => `<div><h3>${esc(title)}</h3><p>${esc(body || "未提供")}</p></div>`).join("");
+    };
+
+    const populateFilters = () => {
+      const addOptions = (id, values) => {
+        const select = document.getElementById(id);
+        [...new Set(values.filter(Boolean))].sort().forEach(value => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.append(option);
+        });
+      };
+      addOptions("category-filter", allNews.map(item => item.category));
+      addOptions("company-filter", allNews.map(item => item.company));
+      const apply = () => {
+        const category = document.getElementById("category-filter").value;
+        const company = document.getElementById("company-filter").value;
+        const materiality = document.getElementById("materiality-filter").value;
+        const review = document.getElementById("review-filter").value;
+        const filtered = allNews.filter(item =>
+          (category === "all" || item.category === category) &&
+          (company === "all" || item.company === company) &&
+          (materiality === "all" || materialityBand(Number(item.materiality_score)) === materiality) &&
+          (review === "all" || (review === "required" ? item.manual_review : !item.manual_review))
+        );
+        renderNews(filtered);
+        renderImpactChart(filtered);
+      };
+      ["category-filter", "company-filter", "materiality-filter", "review-filter"].forEach(id => document.getElementById(id).addEventListener("change", apply));
+    };
+
+    renderSummary();
+    renderLeadStories();
+    renderImpactChart(allNews);
+    renderMarketPulse();
+    renderPeerPeChart();
+    renderGrowthChart();
+    renderPeerTable();
+    renderNews();
+    renderActionsAndGaps();
+    renderSources();
+    renderPrompt();
+    populateFilters();
+    document.getElementById("footer-copy").textContent = `Generated ${formatDate(metadata.generated_at)} | Status ${metadata.report_status || "Draft"} | ${metadata.timezone || "Time zone missing"}`;
+  </script>
+</body>
+</html>

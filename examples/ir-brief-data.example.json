@@ -1,0 +1,227 @@
+{
+  "metadata": {
+    "title": "Trip.com Group IR Intelligence Brief",
+    "report_date": "2026-09-01",
+    "generated_at": "2026-09-01T08:30:00+08:00",
+    "as_of": "2026-09-01T08:00:00+08:00",
+    "timezone": "Asia/Shanghai",
+    "coverage_start": "2026-08-31T08:00:00+08:00",
+    "coverage_end": "2026-09-01T08:00:00+08:00",
+    "report_status": "Example",
+    "language": "zh-CN",
+    "region_scope": "China, United States, Europe, Asia-Pacific",
+    "data_freshness": "示例数据，仅用于验证布局"
+  },
+  "executive_summary": [
+    {
+      "text": "示例结论：跨境政策变化可能影响目的地搜索与转化，需要结合航班供给判断实际弹性。",
+      "direction": "positive",
+      "ir_action": "示例动作：准备搜索趋势与航班运力的配套数据。"
+    },
+    {
+      "text": "示例结论：对话式旅行搜索继续改变流量入口，但商业影响仍取决于交易闭环与库存覆盖。",
+      "direction": "mixed",
+      "ir_action": "示例动作：跟踪主要平台产品发布和用户采用情况。"
+    },
+    {
+      "text": "示例结论：同业估值比较必须锁定同一日期、财年和调整口径。",
+      "direction": "neutral",
+      "ir_action": "示例动作：正式交付前替换全部演示倍数。"
+    }
+  ],
+  "top_stories": [
+    {
+      "id": "N001",
+      "title": "示例：某市场更新跨境旅行便利化政策",
+      "category": "Macro",
+      "company": "Trip.com Group",
+      "region": "Asia-Pacific",
+      "published_at": "2026-09-01T06:30:00+08:00",
+      "summary": "这是演示事实摘要，不代表真实政策或公司信息。",
+      "transmission_path": "政策便利化 → 出行意愿 → 航班与酒店搜索 → OTA转化",
+      "counterpoint": "实际影响仍取决于航班运力、价格和执行细则。",
+      "direction": "positive",
+      "horizon": "1-2 quarters",
+      "impact": 5,
+      "urgency": 4,
+      "materiality_score": 84,
+      "ir_action": "Prepare Q&A：示例动作，核对政策原文与内部公开数据。",
+      "manual_review": true,
+      "source_ids": ["S001"]
+    }
+  ],
+  "news": [
+    {
+      "id": "N002",
+      "title": "示例：旅行平台发布对话式搜索功能",
+      "category": "Internet + AI",
+      "company": "Example Travel Platform",
+      "region": "Global",
+      "published_at": "2026-08-31T18:00:00+08:00",
+      "summary": "这是用于展示新闻卡片的模拟摘要。",
+      "transmission_path": "对话式入口 → 搜索行为变化 → 流量分配与获客效率",
+      "counterpoint": "产品发布不等于规模化使用或财务贡献。",
+      "direction": "mixed",
+      "horizon": "Structural",
+      "impact": 4,
+      "urgency": 3,
+      "materiality_score": 68,
+      "ir_action": "Monitor：示例动作，跟踪使用率、库存覆盖和交易闭环。",
+      "manual_review": true,
+      "source_ids": ["S002"]
+    },
+    {
+      "id": "N003",
+      "title": "示例：酒店集团调整亚太扩张计划",
+      "category": "OTA + Travel",
+      "company": "Example Hotel Group",
+      "region": "Asia-Pacific",
+      "published_at": "2026-08-31T12:00:00+08:00",
+      "summary": "这是用于展示OTA与旅游行业模块的模拟摘要。",
+      "transmission_path": "酒店供给变化 → 目的地库存 → 平台内容与间夜增长",
+      "counterpoint": "签约项目不一定按计划开业，新增供给节奏存在不确定性。",
+      "direction": "neutral",
+      "horizon": "Structural",
+      "impact": 3,
+      "urgency": 2,
+      "materiality_score": 52,
+      "ir_action": "Background：示例动作，按季度复核开业和库存进度。",
+      "manual_review": true,
+      "source_ids": ["S003"]
+    }
+  ],
+  "market_pulse": [
+    {
+      "label": "示例油价指数",
+      "value": 102.4,
+      "change": 1.2,
+      "unit": "index",
+      "as_of": "2026-09-01T07:00:00+08:00",
+      "trend": [98.0, 99.2, 100.1, 99.8, 101.0, 102.4],
+      "source_id": "S004"
+    },
+    {
+      "label": "示例航班运力指数",
+      "value": 108.6,
+      "change": 0.8,
+      "unit": "index",
+      "as_of": "2026-09-01T07:00:00+08:00",
+      "trend": [103.0, 104.5, 104.0, 106.2, 107.5, 108.6],
+      "source_id": "S004"
+    }
+  ],
+  "peers": [
+    {
+      "company": "Trip.com Group Example",
+      "ticker": "TCOM-EXAMPLE",
+      "listing": "Example",
+      "currency": "USD",
+      "fiscal_basis": "Calendar year example",
+      "share_basis": "ADS example",
+      "metric_basis": "Illustrative consensus, non-GAAP example",
+      "as_of": "2026-09-01T07:00:00+08:00",
+      "pe_26e": 18.0,
+      "ev_ebitda_26e": 12.0,
+      "revenue_growth": 16.0,
+      "ebitda_margin": 31.0,
+      "source_id": "S005"
+    },
+    {
+      "company": "Global OTA Peer Example",
+      "ticker": "PEER-EXAMPLE",
+      "listing": "Example",
+      "currency": "USD",
+      "fiscal_basis": "Calendar year example",
+      "share_basis": "Ordinary share example",
+      "metric_basis": "Illustrative consensus, non-GAAP example",
+      "as_of": "2026-09-01T07:00:00+08:00",
+      "pe_26e": 22.0,
+      "ev_ebitda_26e": 14.0,
+      "revenue_growth": 11.0,
+      "ebitda_margin": 35.0,
+      "source_id": "S005"
+    },
+    {
+      "company": "Travel Platform Peer Example",
+      "ticker": "TRAVEL-EXAMPLE",
+      "listing": "Example",
+      "currency": "USD",
+      "fiscal_basis": "Calendar year example",
+      "share_basis": "Ordinary share example",
+      "metric_basis": "Illustrative consensus, adjusted example",
+      "as_of": "2026-09-01T07:00:00+08:00",
+      "pe_26e": 20.0,
+      "ev_ebitda_26e": 11.0,
+      "revenue_growth": 13.0,
+      "ebitda_margin": 27.0,
+      "source_id": "S005"
+    }
+  ],
+  "data_gaps": [
+    "全部新闻、市场指标和同业倍数均为示例数据，正式交付前必须替换。",
+    "示例未包含真实新闻图片，HTML应显示无图布局。",
+    "正式同业比较需要统一估值日期、财年、币种、ADS和调整口径。"
+  ],
+  "sources": [
+    {
+      "id": "S001",
+      "name": "示例政策来源",
+      "source_type": "example",
+      "title": "演示数据，不是真实政策公告",
+      "published_at": "2026-09-01T06:30:00+08:00",
+      "accessed_at": "2026-09-01T08:05:00+08:00",
+      "reliability": "low",
+      "manual_review": true,
+      "source_note": "仅用于HTML模板测试，不可用于正式IR交付。"
+    },
+    {
+      "id": "S002",
+      "name": "示例技术来源",
+      "source_type": "example",
+      "title": "演示数据，不是真实产品公告",
+      "published_at": "2026-08-31T18:00:00+08:00",
+      "accessed_at": "2026-09-01T08:06:00+08:00",
+      "reliability": "low",
+      "manual_review": true,
+      "source_note": "仅用于HTML模板测试，不可用于正式IR交付。"
+    },
+    {
+      "id": "S003",
+      "name": "示例行业来源",
+      "source_type": "example",
+      "title": "演示数据，不是真实酒店公告",
+      "published_at": "2026-08-31T12:00:00+08:00",
+      "accessed_at": "2026-09-01T08:07:00+08:00",
+      "reliability": "low",
+      "manual_review": true,
+      "source_note": "仅用于HTML模板测试，不可用于正式IR交付。"
+    },
+    {
+      "id": "S004",
+      "name": "示例市场数据",
+      "source_type": "example",
+      "title": "演示指标数据",
+      "published_at": "2026-09-01T07:00:00+08:00",
+      "accessed_at": "2026-09-01T08:08:00+08:00",
+      "reliability": "low",
+      "manual_review": true,
+      "source_note": "仅用于图表渲染测试，不是真实市场数据。"
+    },
+    {
+      "id": "S005",
+      "name": "示例同业数据库",
+      "source_type": "example",
+      "title": "演示估值数据",
+      "published_at": "2026-09-01T07:00:00+08:00",
+      "accessed_at": "2026-09-01T08:09:00+08:00",
+      "reliability": "low",
+      "manual_review": true,
+      "source_note": "仅用于图表渲染测试，不是真实估值数据。"
+    }
+  ],
+  "prompt_used": {
+    "brief": "使用明确标记的演示数据生成HTML图文IR简报。",
+    "screening_criteria": "展示专业信息架构、图表、来源台账和数据缺口，不形成真实公司判断。",
+    "source_scope": "仅使用本地示例JSON，不进行公开搜索。"
+  }
+}
