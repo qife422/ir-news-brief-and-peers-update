@@ -1,0 +1,37 @@
+{
+  "generation": {
+    "prompt": "Example protocol: prepare questions from the frozen pre-cutoff public inputs only. Do not read actual-question holdout materials.",
+    "config": {"language": "zh-CN", "audience": "public"}
+  },
+  "required_coverage": [
+    {"company": "Trip.com Group", "periods": ["2025Q1", "2025Q2", "2025Q3", "2025Q4"]},
+    {"company": "Booking Holdings", "periods": ["2025Q3", "2025Q4"]},
+    {"company": "Expedia Group", "periods": ["2025Q3", "2025Q4"]}
+  ],
+  "cases": [
+    {
+      "case_type": "peer_update",
+      "data_kind": "Example",
+      "permission_ref": null,
+      "human_review": null,
+      "metrics": {"preparation_time": null, "factual_accuracy": null, "question_value": null, "feedback_reuse": null},
+      "holdout": {"contaminated": null, "opened_at": null, "frozen_candidate_sha256": null}
+    },
+    {
+      "case_type": "earnings_preparation",
+      "data_kind": null,
+      "permission_ref": null,
+      "human_review": null,
+      "metrics": {"preparation_time": null, "factual_accuracy": null, "question_value": null, "feedback_reuse": null},
+      "holdout": {"contaminated": null, "opened_at": null, "frozen_candidate_sha256": null}
+    },
+    {
+      "case_type": "meeting",
+      "data_kind": null,
+      "permission_ref": null,
+      "human_review": null,
+      "metrics": {"preparation_time": null, "factual_accuracy": null, "question_value": null, "feedback_reuse": null},
+      "holdout": {"contaminated": null, "opened_at": null, "frozen_candidate_sha256": null}
+    }
+  ]
+}

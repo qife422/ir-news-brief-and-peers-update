@@ -2,7 +2,7 @@
 
 An evidence-first AI + investor-relations workflow for Trip.com Group and travel/OTA peers.
 
-把新闻与同业变化转化为**可追溯的议题、投资者问题、回答草稿和准备动作**，并保留财报、答复版本与人工确认的会议反馈。当前能力版本 **2.0.0**，规范入口为 [SKILL.md](SKILL.md)。
+把新闻与同业变化转化为**可追溯的议题、投资者问题、回答草稿和准备动作**，并保留财报、答复版本与人工确认的会议反馈。当前本地能力版本 **2.1.0**，规范入口为 [SKILL.md](SKILL.md)；本地更新不代表已经推送到 GitHub。
 
 本仓库用于源码异地备份、能力展示和后续更新。它是可供 Codex 使用的 Skill 与本地 Python 工具，不是公司官方 IR 平台、投资建议系统或自动对外回复服务。
 
@@ -16,6 +16,7 @@ An evidence-first AI + investor-relations workflow for Trip.com Group and travel
 | 财报 Q&A 与预期差异 | 从现有证据准备问答；用 Decimal 计算实际值与财报前有效 consensus 的差异，缺失/不可比/零/负基数明确标记 |
 | 会议准备与反馈 | 复用适用答复与历史问题；实际问题须有原始记录和人工确认，重复导入去重，撤销同步影响计数 |
 | 证据与答复有效性 | 来源有版本、文段位置及时间；撤回、替代、正文变更或到期后重新判断依赖与复核状态 |
+| 试点覆盖与业务验收 | 按有效公开事实检查公司／季度缺口；冻结完整候选输入、配置和报告，记录三个真实案例与四指标；不自动接受业务结果 |
 | 输出与展示 | 独立 HTML、Markdown、来源台账和数据缺口；HTML 支持搜索、筛选、键盘、移动布局与打印 |
 | 受控 Excel 流程 | 提供工作簿盘点、备份、单元格级修改和回读契约；**不附自动 Excel 更新脚本** |
 
@@ -39,7 +40,8 @@ ir-news-brief-and-peers-update/
 │   ├── validate_ir_data.py   原新闻简报数据校验
 │   ├── render_html_brief.py  原新闻简报 HTML 渲染
 │   ├── ir_workflow.py        雷达/财报/会议校验、投影、事件与快照
-│   └── render_workflow.py    工作流 HTML/Markdown 渲染
+│   ├── render_workflow.py    工作流 HTML/Markdown 渲染
+│   └── assess_pilot.py       覆盖缺口、候选冻结与人工验收记录检查
 ├── references/               方法、数据治理、字段与操作契约
 ├── examples/                 明确标记为 Example 的演示输入
 ├── assets/html/              独立 HTML 模板
@@ -51,7 +53,7 @@ ir-news-brief-and-peers-update/
 
 ## 运行要求
 
-- Python **3.9+**；四个脚本与测试均使用标准库，不需要 API Key 或 Python 第三方包。
+- Python **3.9+**；五个脚本与测试均使用标准库，不需要 API Key 或 Python 第三方包。
 - 系统须有 IANA 时区数据。部分 Windows 或精简环境需额外提供时区数据库，否则 `zoneinfo` 无法识别所选时区。
 - 浏览器用于阅读 HTML 和打印 PDF；联网研究、Excel 操作需使用者另行提供对应工具、材料及授权。
 - 下列 shell 示例面向 macOS/Linux；Windows 请将 `python3` 与 `/tmp` 输出路径替换为本机命令和一个新建的工作目录。
@@ -97,6 +99,17 @@ python3 scripts/render_html_brief.py examples/ir-brief-data.example.json "$ir_de
 
 财报及会议请求见 [prompts.md](prompts.md)，精确字段和 CLI 见 [workspace-schema.md](references/workspace-schema.md)。
 
+## 检查升级目标是否真正达到
+
+使用 [试点验收说明](references/pilot-acceptance.md) 和 [Example 评审表](examples/pilot-assessment.example.json) 创建业务项目内的真实计划，再运行：
+
+```bash
+python3 scripts/assess_pilot.py freeze WORKSPACE.json GENERATION.json FROZEN.json
+python3 scripts/assess_pilot.py assess WORKSPACE.json PLAN.json ASSESSMENT.json --freeze FROZEN.json
+```
+
+输出目录须存在，文件拒绝覆盖。`covered` 只表示该公司／期间至少存在有效公开事实，不表示整季业务内容完整；脚本分别显示同业更新、财报准备、会议准备的待补输入、待冻结和待人工验收状态。耗时、准确性、问题采纳和复用指标没有实际记录时保持 null；即使表格齐全也不自动变成 Final。实际问题 holdout 应在候选冻结后由独立评估者打开，不放进作者原始材料或提示词。
+
 ## 丢失后恢复
 
 在你的 Skill 规范目录的父目录（例如工作区的 `skills/`）运行：
@@ -131,7 +144,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 ```
 
-当前基线有 **80 项测试**，覆盖原简报入口、时间与版本、来源失效、复核 digest、受众隔离、财务口径、反馈去重/撤销、非覆写及渲染引用。详见 [TEST_PLAN.md](TEST_PLAN.md)。测试不证明真实数据许可、每条自然语言的充分支持、投资者问题概率、业务收益或正式披露合规。
+测试覆盖原简报入口、时间与版本、来源失效、复核 digest、受众隔离、财务口径、反馈去重/撤销、非覆写及渲染引用；2.1 另加实际／转述问题的原始记录门禁、覆盖缺口、冻结失效及业务评审反例。实际运行数量与结果以本次测试输出为准，详见 [TEST_PLAN.md](TEST_PLAN.md)。测试不证明真实数据许可、每条自然语言的充分支持、投资者问题概率、业务收益或正式披露合规。
 
 输出保持 `Example` 或 `Draft`；单条回答可有已记录的复核状态，但 `Final` 仍需用户或指定审阅人明确接受。内部或 licensed 材料及其依赖不得进入公开输出，不能靠隐藏 DOM 字段代替数据隔离。
 

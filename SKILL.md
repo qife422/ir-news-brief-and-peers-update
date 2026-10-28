@@ -2,7 +2,7 @@
 name: ir-news-brief-and-peers-update
 description: Prepare source-backed Trip.com Group IR briefs, investor-question radars, earnings Q&A and variance analysis, and manually confirmed meeting feedback. Use for travel and OTA market intelligence, peer updates, earnings preparation, or investor-meeting preparation with traceable evidence and financial definitions.
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
 ---
 
 # IR新闻简报与同业数据更新
@@ -23,6 +23,7 @@ Choose one or combine only when the user asks:
 - **Investor-question radar:** maintain topics, evidence, changes, candidate questions and answer preparation across report snapshots.
 - **Earnings preparation:** prepare evidence-backed Q&A and calculate actual-versus-consensus differences only from comparable authorized snapshots.
 - **Meeting preparation and feedback:** use manually confirmed meeting records for a meeting brief, follow-ups and actual-question counts.
+- **Pilot coverage and business review:** expose missing company/period evidence and prepare measured human acceptance without treating tests or Example runs as business completion.
 
 Read only the references needed for the selected route:
 
@@ -34,6 +35,7 @@ Read only the references needed for the selected route:
 - For earnings Q&A and numerical comparisons, read [references/earnings-prep.md](references/earnings-prep.md).
 - For meeting records and confirmation, read [references/meeting-feedback.md](references/meeting-feedback.md).
 - For the new workspace fields and executable commands, read [references/workspace-schema.md](references/workspace-schema.md).
+- For multi-quarter coverage, frozen candidates, actual-question holdouts and the three real business cases, read [references/pilot-acceptance.md](references/pilot-acceptance.md).
 
 ## Required intake
 
@@ -66,7 +68,9 @@ Use `--previous` for an earlier projected report, `--as-of` for an explicit time
 
 The workflow excludes unavailable material versions and unauthorized audiences before selecting claims, topics, questions or answers. It propagates source invalidation and binds answer review to content and evidence. Public HTML embeds only the projected report, never the raw workspace. Do not put internal evidence, its derived wording or private meeting records in public searches, outputs or diagnostic messages.
 
-Actual investor questions require a source locator and explicit human confirmation. Predicted questions and second-hand comments remain separate, duplicate records do not increase counts, and revocation removes their effect. A reviewed answer is not automatically Final; formal delivery still requires explicit acceptance.
+Actual and paraphrased questions require a permitted original record, source locator and human confirmation available by the report cutoff before their wording or derived answers can be shown. Public trigger claims cannot substitute for that origin evidence. Predicted questions and second-hand comments remain separate, duplicate records do not increase actual counts, and revocation removes their effect. A reviewed answer is not automatically Final; formal delivery still requires explicit acceptance.
+
+For business pilots, use `assess_pilot.py` with the actual workspace and a local plan to distinguish eligible public coverage, frozen candidate identity and incomplete human review. Preserve unknown baseline metrics as null. A candidate hash does not prove that its author never saw held-out actual questions; keep those inputs outside the author bundle and record contamination honestly. Do not mark the three real cases complete merely because coverage or automated checks pass.
 
 Scripts validate dependencies and calculate differences. Codex reads evidence and authors the topic analysis, questions and drafts; the scripts do not autonomously research, generate investment judgments or assess disclosure legality. Real consensus access and confidential meeting processing require the actual permitted inputs and environment, not only a schema flag.
 

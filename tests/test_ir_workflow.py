@@ -704,6 +704,142 @@ class WorkflowHistoryAndCitationTests(unittest.TestCase):
         self.assertEqual(topic["actual_question_count"], 0)
 
 
+class WorkflowQuestionOriginGateTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.data = workspace()
+        self.question_marker = "EXAMPLE_ACTUAL_QUESTION_7739"
+        self.follow_up_marker = "EXAMPLE_ACTUAL_FOLLOW_UP_7739"
+        self.answer_marker = "EXAMPLE_ACTUAL_ANSWER_7739"
+        question = copy.deepcopy(self.data["questions"][0])
+        question.update(id="q-recorded", origin="actual", text=self.question_marker,
+                        follow_ups=[self.follow_up_marker])
+        self.data["questions"].append(question)
+        answer = copy.deepcopy(self.data["answers"][0])
+        answer.update(id="a-recorded", question_id="q-recorded")
+        answer["statements"][0]["text"] = self.answer_marker
+        self.data["answers"].append(answer)
+        add_evidence(self.data, "recorded", self.question_marker)
+        self.data["meetings"] = [{
+            "id": "m-recorded", "title": "Example recorded meeting", "at": BEFORE,
+            "question_ids": ["q-recorded"], **copy.deepcopy(PUBLIC),
+        }]
+        self.data["feedback"] = [{
+            "id": "f-recorded", "question_id": "q-recorded", "meeting_id": "m-recorded",
+            "kind": "actual", "excerpt_id": "e-recorded",
+            "confirmation": {"status": "confirmed", "reviewer": "Example reviewer", "at": BEFORE},
+        }]
+
+    def record_source(self) -> dict:
+        return next(source for source in self.data["sources"] if source["id"] == "s-recorded")
+
+    def assert_recorded_content_withheld(self) -> dict:
+        report = build_report(self.data, audience="public")
+        output = serialized(report)
+        for marker in (self.question_marker, self.follow_up_marker, self.answer_marker):
+            self.assertNotIn(marker, output, "Recorded question or derived answer crossed its origin gate")
+        topic = next(topic for topic in report["topics"] if topic["id"] == "t-ai")
+        recorded = next(question for question in topic["questions"] if question["id"] == "q-recorded")
+        self.assertEqual(recorded["status"], "NeedsEvidence")
+        self.assertEqual(recorded["actual_question_count"], 0)
+        self.assertEqual(recorded["follow_ups"], [])
+        self.assertEqual(recorded["citations"], [])
+        answer = next(answer for answer in topic["answers"] if answer["id"] == "a-recorded")
+        self.assertEqual(answer["statements"], [])
+        return report
+
+    def test_confirmed_past_original_record_allows_actual_question_and_answer(self) -> None:
+        report = build_report(self.data)
+        output = serialized(report)
+        for marker in (self.question_marker, self.follow_up_marker, self.answer_marker):
+            self.assertIn(marker, output)
+        topic = report["topics"][0]
+        recorded = next(question for question in topic["questions"] if question["id"] == "q-recorded")
+        self.assertEqual(recorded["status"], "ready")
+        self.assertEqual(recorded["actual_question_count"], 1)
+        self.assertEqual(recorded["citations"][0]["excerpt_id"], "e-recorded")
+
+    def test_public_triggers_do_not_replace_missing_original_record(self) -> None:
+        self.data["feedback"] = []
+        self.assert_recorded_content_withheld()
+
+    def test_future_meeting_with_public_triggers_cannot_leak_recorded_wording(self) -> None:
+        self.data["meetings"][0]["at"] = AFTER
+        self.data["feedback"][0]["confirmation"]["at"] = AFTER
+        self.assert_recorded_content_withheld()
+
+    def test_future_record_source_cannot_leak_wording_from_a_past_meeting(self) -> None:
+        self.record_source().update(published_at=AFTER, available_at=AFTER,
+                                    version_at=AFTER, retrieved_at=AFTER)
+        self.assert_recorded_content_withheld()
+
+    def test_retracted_record_source_cannot_keep_recorded_wording(self) -> None:
+        self.record_source().update(status="retracted", invalidated_at="2025-01-15T00:00:00Z")
+        self.assert_recorded_content_withheld()
+
+    def test_unauthorized_original_record_cannot_keep_recorded_wording(self) -> None:
+        self.record_source()["authorized"] = False
+        self.assert_recorded_content_withheld()
+
+    def test_public_triggers_cannot_disclose_a_private_meeting(self) -> None:
+        self.data["metadata"]["allowed_visibility"] = ["public", "internal"]
+        self.data["meetings"][0].update(visibility="internal", audiences=["internal"])
+        self.assert_recorded_content_withheld()
+        internal = build_report(self.data, audience="internal")
+        self.assertIn(self.question_marker, serialized(internal))
+
+    def test_public_triggers_cannot_disclose_a_private_original_excerpt(self) -> None:
+        self.data["metadata"]["allowed_visibility"] = ["public", "internal"]
+        self.record_source().update(visibility="internal", audiences=["internal"])
+        self.assert_recorded_content_withheld()
+
+    def test_unconfirmed_record_cannot_bypass_review_using_public_triggers(self) -> None:
+        self.data["feedback"][0]["confirmation"] = {"status": "pending"}
+        self.assert_recorded_content_withheld()
+
+    def test_future_confirmation_cannot_approve_historical_recorded_wording(self) -> None:
+        self.data["feedback"][0]["confirmation"]["at"] = AFTER
+        self.assert_recorded_content_withheld()
+
+    def test_revocation_removes_question_follow_ups_and_derived_answer(self) -> None:
+        self.data["events"] = [{
+            "id": "ev-recorded-revoked", "at": "2025-01-15T00:00:00Z",
+            "type": "feedback_revoke", "target_id": "f-recorded", "reviewer": "Example reviewer",
+        }]
+        self.assert_recorded_content_withheld()
+
+    def test_confirmed_paraphrase_keeps_its_kind_and_does_not_count_as_actual(self) -> None:
+        self.data["questions"][1]["origin"] = "paraphrase"
+        self.data["feedback"][0]["kind"] = "paraphrase"
+        report = build_report(self.data)
+        topic = report["topics"][0]
+        recorded = next(question for question in topic["questions"] if question["id"] == "q-recorded")
+        self.assertEqual(recorded["text"], self.question_marker)
+        self.assertEqual(recorded["origin"], "paraphrase")
+        self.assertEqual(recorded["actual_question_count"], 0)
+        self.assertEqual(topic["actual_question_count"], 0)
+        self.assertEqual(report["meeting_brief"]["meetings"][0]["actual_question_count"], 0)
+        self.assertEqual(recorded["citations"][0]["excerpt_id"], "e-recorded")
+
+    def test_paraphrase_cannot_use_actual_confirmation_with_a_different_kind(self) -> None:
+        self.data["questions"][1]["origin"] = "paraphrase"
+        self.assert_recorded_content_withheld()
+
+    def test_paraphrase_without_original_record_is_withheld(self) -> None:
+        self.data["questions"][1]["origin"] = "paraphrase"
+        self.data["feedback"] = []
+        self.assert_recorded_content_withheld()
+
+    def test_anticipated_questions_still_use_public_trigger_evidence(self) -> None:
+        self.data["feedback"] = []
+        report = build_report(self.data)
+        anticipated = next(question for question in report["topics"][0]["questions"]
+                           if question["id"] == "q-ai")
+        self.assertEqual(anticipated["status"], "ready")
+        self.assertEqual(anticipated["text"], self.data["questions"][0]["text"])
+        self.assertEqual(anticipated["origin"], "anticipated")
+        self.assertEqual(anticipated["actual_question_count"], 0)
+
+
 class WorkflowCommandTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory()

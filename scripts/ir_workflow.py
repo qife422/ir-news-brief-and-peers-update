@@ -584,18 +584,23 @@ def build_report(data, previous=None, mode="radar", audience=None, as_of=None):
             continue
         if _dt(meeting["at"]) > cutoff or excerpt_state(feedback["excerpt_id"]) != "active":
             continue
-        if feedback["kind"] != "actual" or question["origin"] != "actual":
+        if feedback["kind"] not in {"actual", "paraphrase"} or feedback["kind"] != question["origin"]:
             continue
         confirmation = feedback["confirmation"]
         if confirmation["status"] == "pending" or _dt(confirmation["at"]) > cutoff:
             continue
-        key = (feedback["meeting_id"], " ".join(question["text"].split()).casefold())
+        key = (feedback["meeting_id"], feedback["kind"], " ".join(question["text"].split()).casefold())
         value = (confirmation["at"], feedback["id"], feedback)
         def feedback_order(item):
             return (_dt(item[0]), item[2]["confirmation"]["status"] == "revoked", item[1])
         if key not in feedback_groups or feedback_order(value) > feedback_order(feedback_groups[key]):
             feedback_groups[key] = value
-    confirmed_feedback = [v[2] for v in feedback_groups.values() if v[2]["confirmation"]["status"] == "confirmed"]
+    confirmed_origin_feedback = [v[2] for v in feedback_groups.values()
+                                 if v[2]["confirmation"]["status"] == "confirmed"]
+    confirmed_feedback = [feedback for feedback in confirmed_origin_feedback if feedback["kind"] == "actual"]
+    confirmed_by_question = {}
+    for feedback in confirmed_origin_feedback:
+        confirmed_by_question.setdefault(feedback["question_id"], []).append(feedback)
     actual_by_question = {}
     for feedback in confirmed_feedback:
         actual_by_question.setdefault(feedback["question_id"], []).append(feedback)
@@ -645,12 +650,16 @@ def build_report(data, previous=None, mode="radar", audience=None, as_of=None):
             if not node_permission(question) or not deps_public(refs):
                 continue
             actual = actual_by_question.get(question["id"], [])
-            eligible = deps_ok(refs) or (question["origin"] == "actual" and bool(actual))
+            origin_records = confirmed_by_question.get(question["id"], [])
+            # Anticipated wording is generated from evidence. Actual/paraphrased
+            # wording is learned from an original record, so trigger claims alone
+            # cannot establish that its text was known and cleared at the cutoff.
+            eligible = deps_ok(refs) if question["origin"] == "anticipated" else bool(origin_records)
             item = {"id": question["id"], "origin": question["origin"],
                     "label": {"anticipated": "AI预拟", "actual": "真实问题（已确认）" if actual else "真实问题（待确认）", "paraphrase": "转述"}[question["origin"]],
                     "status": "ready" if eligible else "NeedsEvidence", "actual_question_count": len(actual),
                     "trigger_claim_ids": refs, "follow_ups": question.get("follow_ups", []) if eligible else [],
-                    "citations": [citation(f["excerpt_id"]) for f in actual]}
+                    "citations": [citation(f["excerpt_id"]) for f in origin_records]}
             if eligible:
                 item["text"] = question["text"]
             used_sources.update(c["source_id"] for c in item["citations"])

@@ -1,5 +1,16 @@
 # TEST PLAN
 
+## IR workflow 2.1 additions
+
+- Future/private/retracted/unconfirmed actual or paraphrased question records cannot leak wording, follow-ups or derived answers through public trigger claims. Confirmed historical records work; paraphrases do not count as actual questions.
+- Coverage requires an eligible confirmed non-Example public fact for the exact company/period, not merely a source, a question, an empty topic or a claimed case label.
+- Full workspace, candidate report, prompt/config and core fingerprints must match; changed inputs or future freeze times cannot retain review applicability.
+- Review binds the exact candidate; future reviews, review-before-freeze/holdout, contaminated or future holdout declarations remain pending.
+- Missing measurements stay null; uncertain facts are not correct; inconsistent counts, non-finite values and incomparable timings do not produce false improvement claims.
+- Both new CLI paths reject overwriting outputs or inputs. Examples and complete declarations never auto-accept real business cases or promote to Final.
+
+See [pilot-acceptance.md](references/pilot-acceptance.md) for the actual human review protocol. These tests do not conduct a real blind comparison or measure business efficiency.
+
 ## IR workflow 2.0
 
 Run the same unittest discovery command below to cover the original brief and new workflow. New fixtures are declared Example; factual text still needs passage review.

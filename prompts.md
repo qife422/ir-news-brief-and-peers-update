@@ -1,5 +1,20 @@
 # Prompt Templates
 
+## Pilot coverage and business review
+
+```text
+请使用 $ir-news-brief-and-peers-update 检查本轮升级业务试点的实际覆盖与剩余验收。
+工作区和试点计划JSON路径：
+要求覆盖的公司及季度：
+实际交给作者的提示／配置、候选冻结文件：
+指定IR审阅人及获准输入（未知项保持待提供）：
+
+按有效公开事实报告覆盖缺口；分别列出同业更新、财报准备、会议准备的输入和人审状态。
+没有真人计时、逐条事实审阅、问题采纳或实际复用证据时不填基线数字。
+先冻结输入和候选，再由未参与作者上下文的评估者打开实际问题holdout；已暴露则如实标污染。
+只输出本地Draft验收记录，不将测试通过、Example或表格齐全称作业务完成。
+```
+
 ## Investor question radar
 
 ```text
